@@ -12,8 +12,13 @@
         @mousedown.left="handleClick(char)"
         @mouseenter.left="hover ? handleMove(char) : ''"
         @mouseup.left="mouseOver"
+        @touchstart="handleClick(char)"
+        @touchenter="hover ? handleMove(char) : ''"
+        @touchcancel="mouseOver"
       >
-        {{ char.value }}
+        <span>
+          {{ char.value }}
+        </span>
       </button>
     </div>
   </div>
@@ -105,8 +110,6 @@ const handleClick = (char) => {
 
   background: #ffffff;
   color: #000000;
-  font-weight: 700;
-  font-size: 5vmin;
 
   --d: calc(var(--i) / var(--total));
 
@@ -120,6 +123,12 @@ const handleClick = (char) => {
     rotate(calc(-1 * var(--r)));
 
   transform: var(--transform);
+}
+
+.char-button span {
+  font-weight: 700;
+  font-size: 5vmin;
+  text-align: center;
 }
 
 .char-pressed {
