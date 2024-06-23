@@ -1,24 +1,26 @@
 <template>
-  <div
-    class="circle"
-    :style="`--total: ${props.characters.length}`"
-  >
-    <button
-      v-for="(char, idx) in chars"
-      class="char-button"
-      :class="char.hover"
-      :style="`--i: ${idx}; background-color: ${char.hover ? `pink` : `white`}`"
-      @mousedown.left="handleClick(char)"
-      @mouseenter.left="hover ? handleMove(char) : ''"
-      @mouseup="mouseOver"
+  <div style="display: flex; align-items: center">
+    <div
+      class="circle"
+      :style="`--total: ${props.characters.length}`"
     >
-      {{ char.value }}
-    </button>
+      <button
+        v-for="(char, idx) in chars"
+        class="char-button"
+        :class="char.hover"
+        :style="`--i: ${idx}`"
+        @mousedown.left="handleClick(char)"
+        @mouseenter.left="hover ? handleMove(char) : ''"
+        @mouseup.left="mouseOver"
+      >
+        {{ char.value }}
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, watch, onMounted } from "vue";
 
 const chars = ref([]);
 const hover = ref(false);
@@ -31,19 +33,31 @@ const props = defineProps({
   },
 });
 
-chars.value = props.characters.map((char) => {
-  return {
-    value: char,
-    hover: "",
-  };
+onMounted(() => {
+  fillChars();
 });
+
+watch(props, () => {
+  fillChars();
+});
+
+const fillChars = () => {
+  chars.value = props.characters.map((char) => {
+    return {
+      value: char,
+      hover: "",
+    };
+  });
+};
 
 const mouseOver = () => {
   hover.value = false;
   chars.value.forEach((char) => {
     char.hover = "";
   });
-  emit("typeOver");
+  setTimeout(() => {
+    emit("typeOver");
+  }, 500);
 };
 
 const handleMove = (char) => {
@@ -71,7 +85,7 @@ const handleClick = (char) => {
   -webkit-border-radius: 50%;
   width: 294px;
 
-  --radius: 25vmin;
+  --radius: 20vmin;
   width: calc(2 * var(--radius));
   height: calc(2 * var(--radius));
 }
@@ -79,8 +93,8 @@ const handleClick = (char) => {
 .char-button {
   cursor: pointer;
   grid-area: layer;
-  width: 8vmin;
-  height: 8vmin;
+  width: 10vmin;
+  height: 10vmin;
   border-radius: 50%;
   border: 0;
   box-shadow: 0 2px #b0b0b0;
@@ -91,8 +105,8 @@ const handleClick = (char) => {
 
   background: #ffffff;
   color: #000000;
-  font-weight: bold;
-  font-size: 3vmin;
+  font-weight: 700;
+  font-size: 5vmin;
 
   --d: calc(var(--i) / var(--total));
 
