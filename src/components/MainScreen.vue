@@ -1,5 +1,5 @@
 <template>
-  <div style="text-align: center">Level {{ props.levelNum }}</div>
+  <div class="level-title">Уровень {{ props.levelNum }}</div>
   <div class="main-container">
     <div class="words">
       <div
@@ -84,13 +84,16 @@ const findUniqueChars = () => {
 };
 
 const showWord = (word) => {
-  inputWord.value.push(word);
+  if (inputWord.value[inputWord.value.length - 1] == word) {
+    return;
+  } else {
+    inputWord.value.push(word);
+  }
 };
 
 const compareWord = () => {
   wordChars.value.find((word) => {
     if (word.chars.join("") === inputWord.value.join("")) {
-      console.log("find");
       word.guessed = true;
       return true;
     }
@@ -116,13 +119,21 @@ const checkProgress = () => {
     }
   });
   if (count === wordChars.value.length) {
-    console.log("win");
     emit("onVictory");
   }
 };
 </script>
 
 <style scoped>
+.level-title {
+  margin: 2vmin 0 4vmin;
+  font: "VAG World";
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 30px;
+  color: #ffffff;
+  text-align: center;
+}
 .main-container {
   display: flex;
   flex-direction: column;
@@ -135,7 +146,7 @@ const checkProgress = () => {
 }
 
 .word-input {
-  height: 15vmin;
+  height: 10vmin;
 }
 
 .word-container {
@@ -149,13 +160,13 @@ const checkProgress = () => {
 .char-cell {
   background-color: #ffffff;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 8px;
   font: "VAG World";
   font-weight: 700;
   font-size: 3vmin;
   width: 5vmin;
   height: 5vmin;
-  margin: 6px;
+  margin: 2px;
 }
 
 .char-cell-guessed {
@@ -171,6 +182,10 @@ const checkProgress = () => {
     font-size: 5vmin;
     width: 8vmin;
     height: 8vmin;
+  }
+
+  .word-input {
+    height: 20vmin;
   }
 }
 </style>

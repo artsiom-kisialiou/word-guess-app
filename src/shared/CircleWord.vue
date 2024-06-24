@@ -1,34 +1,24 @@
 <template>
-  <div class="canvas-container">
-    <canvas
-      ref="drawContainer"
-      width="350"
-      height="350"
-      @pointerdown.left="startDraw"
-      @pointermove="draw"
-      style="position: absolute"
+  <div
+    class="circle"
+    :style="`--total: ${props.characters.length}`"
+  >
+    <button
+      v-for="(char, idx) in chars"
+      class="char-button"
+      :class="char.hover"
+      :style="`--i: ${idx}`"
+      @mousedown.left="handleClick(char)"
+      @mouseenter.left="hover ? handleMove(char) : ''"
+      @mouseup.left="actionOver"
+      @touchstart="handleClick(char)"
+      @touchmove="handleTouch"
+      @touchend="actionOver"
     >
-    </canvas>
-    <div
-      class="circle"
-      :style="`--total: ${props.characters.length}`"
-    >
-      <button
-        v-for="(char, idx) in chars"
-        class="char-button"
-        :class="char.hover"
-        :style="`--i: ${idx}`"
-        @pointerdown="handleClick(char)"
-        @pointerenter="hover ? handleMove(char) : ''"
-        @pointerup="mouseOver"
-        @touchmove="handleTouch"
-        @touchcancel="mouseOver"
-      >
-        <span>
-          {{ char.value }}
-        </span>
-      </button>
-    </div>
+      <span>
+        {{ char.value }}
+      </span>
+    </button>
   </div>
 </template>
 
@@ -37,10 +27,7 @@ import { ref, watch, onMounted } from "vue";
 
 const chars = ref([]);
 const hover = ref(false);
-const drawContainer = ref(null);
-const canvas = ref(null);
-const x = ref(null);
-const y = ref(null);
+
 const emit = defineEmits(["update:modelValue", "typeOver"]);
 const props = defineProps({
   characters: {
@@ -52,7 +39,6 @@ const props = defineProps({
 
 onMounted(() => {
   fillChars();
-  canvas.value = drawContainer.value.getContext("2d");
 });
 
 watch(props, () => {
@@ -68,33 +54,26 @@ const fillChars = () => {
   });
 };
 
-const handleTouch = ($event) => {
-  console.log($event);
+const handleTouch = (e) => {
+  const xPos = e.changedTouches[0].pageX;
+  const yPos = e.changedTouches[0].pageY;
+  const element = document.elementFromPoint(xPos, yPos);
+
+  if (element.classList.contains("char-button")) {
+    const idx = element.style.getPropertyValue("--i");
+    chars.value[idx].hover = "char-pressed";
+    emit("update:modelValue", chars.value[idx].value);
+  }
 };
 
-const mouseOver = (e) => {
-  // drawLine(x.value, y.value, e.offsetX, e.offsetY);
-
-  x.value = 0;
-  y.value = 0;
+const actionOver = () => {
   hover.value = false;
   chars.value.forEach((char) => {
     char.hover = "";
   });
   setTimeout(() => {
-    canvas.value.clearRect(
-      0,
-      0,
-      drawContainer.value.width,
-      drawContainer.value.height
-    );
     emit("typeOver");
   }, 500);
-};
-
-const startDraw = (e) => {
-  x.value = e.offsetX;
-  y.value = e.offsetY;
 };
 
 const handleMove = (char) => {
@@ -107,33 +86,9 @@ const handleClick = (char) => {
   char.hover = "char-pressed";
   emit("update:modelValue", char.value);
 };
-
-const drawLine = (x1, y1, x2, y2) => {
-  canvas.value.beginPath();
-  canvas.value.strokeStyle = "#ffffff";
-  canvas.value.lineWidth = 2;
-  canvas.value.moveTo(x1, y1);
-  canvas.value.lineTo(x2, y2);
-  canvas.value.stroke();
-  canvas.value.closePath();
-};
-
-const draw = (e) => {
-  if (hover.value) {
-    drawLine(x.value, y.value, e.offsetX, e.offsetY);
-    x.value = e.offsetX;
-    y.value = e.offsetY;
-  }
-};
 </script>
 
 <style scoped>
-.canvas-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 .circle {
   display: grid;
   grid-template-areas: "layer";
@@ -162,7 +117,7 @@ const draw = (e) => {
   place-items: center;
 
   background: #ffffff;
-  color: #000000;
+  color: #4d4d4d;
 
   --d: calc(var(--i) / var(--total));
 
