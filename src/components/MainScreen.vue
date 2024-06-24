@@ -1,24 +1,23 @@
 <template>
   <div style="text-align: center">Level {{ props.levelNum }}</div>
   <div class="main-container">
-    <div
-      v-for="(word, idx) in wordChars"
-      :key="idx"
-      class="word-container"
-    >
+    <div class="words">
       <div
-        v-for="(char, i) in word.chars"
-        class="char-cell"
-        :class="word.guessed ? 'char-cell-guessed' : ''"
-        :key="i"
+        v-for="(word, idx) in wordChars"
+        :key="idx"
+        class="word-container"
       >
-        {{ word.guessed ? char : "" }}
+        <div
+          v-for="(char, i) in word.chars"
+          class="char-cell"
+          :class="word.guessed ? 'char-cell-guessed' : ''"
+          :key="i"
+        >
+          {{ word.guessed ? char : "" }}
+        </div>
       </div>
     </div>
-    <div
-      class="word-container"
-      style="height: 100px; padding: 20px"
-    >
+    <div class="word-container word-input">
       <div
         v-for="(cell, idx) in inputWord"
         class="char-cell"
@@ -131,11 +130,19 @@ const checkProgress = () => {
   align-items: center;
 }
 
+.words {
+  height: 50%;
+}
+
+.word-input {
+  height: 15vmin;
+}
+
 .word-container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
 }
 
@@ -145,9 +152,9 @@ const checkProgress = () => {
   border-radius: 10px;
   font: "VAG World";
   font-weight: 700;
-  font-size: 5vmin;
-  width: 8vmin;
-  height: 8vmin;
+  font-size: 3vmin;
+  width: 5vmin;
+  height: 5vmin;
   margin: 6px;
 }
 
@@ -158,5 +165,12 @@ const checkProgress = () => {
 
 .word-block {
   text-align: center;
+}
+@media only screen and (max-width: 600px) {
+  .char-cell {
+    font-size: 5vmin;
+    width: 8vmin;
+    height: 8vmin;
+  }
 }
 </style>

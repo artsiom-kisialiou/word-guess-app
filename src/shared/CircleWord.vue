@@ -1,5 +1,14 @@
 <template>
-  <div style="display: flex; align-items: center">
+  <div class="canvas-container">
+    <canvas
+      ref="drawContainer"
+      width="350"
+      height="350"
+      @pointerdown.left="startDraw"
+      @pointermove="draw"
+      style="position: absolute"
+    >
+    </canvas>
     <div
       class="circle"
       :style="`--total: ${props.characters.length}`"
@@ -9,11 +18,10 @@
         class="char-button"
         :class="char.hover"
         :style="`--i: ${idx}`"
-        @mousedown.left="handleClick(char)"
-        @mouseenter.left="hover ? handleMove(char) : ''"
-        @mouseup.left="mouseOver"
-        @touchstart="handleClick(char)"
-        @touchenter="hover ? handleMove(char) : ''"
+        @pointerdown="handleClick(char)"
+        @pointerenter="hover ? handleMove(char) : ''"
+        @pointerup="mouseOver"
+        @touchmove="handleTouch"
         @touchcancel="mouseOver"
       >
         <span>
@@ -29,6 +37,10 @@ import { ref, watch, onMounted } from "vue";
 
 const chars = ref([]);
 const hover = ref(false);
+const drawContainer = ref(null);
+const canvas = ref(null);
+const x = ref(null);
+const y = ref(null);
 const emit = defineEmits(["update:modelValue", "typeOver"]);
 const props = defineProps({
   characters: {
@@ -40,6 +52,7 @@ const props = defineProps({
 
 onMounted(() => {
   fillChars();
+  canvas.value = drawContainer.value.getContext("2d");
 });
 
 watch(props, () => {
@@ -55,14 +68,33 @@ const fillChars = () => {
   });
 };
 
-const mouseOver = () => {
+const handleTouch = ($event) => {
+  console.log($event);
+};
+
+const mouseOver = (e) => {
+  // drawLine(x.value, y.value, e.offsetX, e.offsetY);
+
+  x.value = 0;
+  y.value = 0;
   hover.value = false;
   chars.value.forEach((char) => {
     char.hover = "";
   });
   setTimeout(() => {
+    canvas.value.clearRect(
+      0,
+      0,
+      drawContainer.value.width,
+      drawContainer.value.height
+    );
     emit("typeOver");
   }, 500);
+};
+
+const startDraw = (e) => {
+  x.value = e.offsetX;
+  y.value = e.offsetY;
 };
 
 const handleMove = (char) => {
@@ -75,31 +107,52 @@ const handleClick = (char) => {
   char.hover = "char-pressed";
   emit("update:modelValue", char.value);
 };
+
+const drawLine = (x1, y1, x2, y2) => {
+  canvas.value.beginPath();
+  canvas.value.strokeStyle = "#ffffff";
+  canvas.value.lineWidth = 2;
+  canvas.value.moveTo(x1, y1);
+  canvas.value.lineTo(x2, y2);
+  canvas.value.stroke();
+  canvas.value.closePath();
+};
+
+const draw = (e) => {
+  if (hover.value) {
+    drawLine(x.value, y.value, e.offsetX, e.offsetY);
+    x.value = e.offsetX;
+    y.value = e.offsetY;
+  }
+};
 </script>
 
 <style scoped>
+.canvas-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .circle {
   display: grid;
   grid-template-areas: "layer";
   place-items: center;
   background-color: transparent;
   border: 10px solid #3e4a68;
-  height: 294px;
   border-radius: 50%;
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
-  width: 294px;
 
-  --radius: 20vmin;
+  --radius: 15vmin;
   width: calc(2 * var(--radius));
   height: calc(2 * var(--radius));
 }
-
 .char-button {
   cursor: pointer;
   grid-area: layer;
-  width: 10vmin;
-  height: 10vmin;
+  width: 6vmin;
+  height: 6vmin;
   border-radius: 50%;
   border: 0;
   box-shadow: 0 2px #b0b0b0;
@@ -127,7 +180,7 @@ const handleClick = (char) => {
 
 .char-button span {
   font-weight: 700;
-  font-size: 5vmin;
+  font-size: 3vmin;
   text-align: center;
 }
 
@@ -135,5 +188,22 @@ const handleClick = (char) => {
   background: #e96fa4;
   color: #ffffff;
   box-shadow: 0 2px #af638c;
+}
+
+@media only screen and (max-width: 600px) {
+  .circle {
+    --radius: 20vmin;
+    width: calc(2 * var(--radius));
+    height: calc(2 * var(--radius));
+  }
+
+  .char-button {
+    width: 10vmin;
+    height: 10vmin;
+  }
+
+  .char-button span {
+    font-size: 5vmin;
+  }
 }
 </style>
