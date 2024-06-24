@@ -1,24 +1,23 @@
 <template>
-  <div style="text-align: center">Level {{ props.levelNum }}</div>
+  <div class="level-title">Уровень {{ props.levelNum }}</div>
   <div class="main-container">
-    <div
-      v-for="(word, idx) in wordChars"
-      :key="idx"
-      class="word-container"
-    >
+    <div class="words">
       <div
-        v-for="(char, i) in word.chars"
-        class="char-cell"
-        :class="word.guessed ? 'char-cell-guessed' : ''"
-        :key="i"
+        v-for="(word, idx) in wordChars"
+        :key="idx"
+        class="word-container"
       >
-        {{ word.guessed ? char : "" }}
+        <div
+          v-for="(char, i) in word.chars"
+          class="char-cell"
+          :class="word.guessed ? 'char-cell-guessed' : ''"
+          :key="i"
+        >
+          {{ word.guessed ? char : "" }}
+        </div>
       </div>
     </div>
-    <div
-      class="word-container"
-      style="height: 100px; padding: 20px"
-    >
+    <div class="word-container word-input">
       <div
         v-for="(cell, idx) in inputWord"
         class="char-cell"
@@ -85,13 +84,16 @@ const findUniqueChars = () => {
 };
 
 const showWord = (word) => {
-  inputWord.value.push(word);
+  if (inputWord.value[inputWord.value.length - 1] == word) {
+    return;
+  } else {
+    inputWord.value.push(word);
+  }
 };
 
 const compareWord = () => {
   wordChars.value.find((word) => {
     if (word.chars.join("") === inputWord.value.join("")) {
-      console.log("find");
       word.guessed = true;
       return true;
     }
@@ -117,13 +119,21 @@ const checkProgress = () => {
     }
   });
   if (count === wordChars.value.length) {
-    console.log("win");
     emit("onVictory");
   }
 };
 </script>
 
 <style scoped>
+.level-title {
+  margin: 2vmin 0 4vmin;
+  font: "VAG World";
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 30px;
+  color: #ffffff;
+  text-align: center;
+}
 .main-container {
   display: flex;
   flex-direction: column;
@@ -131,24 +141,32 @@ const checkProgress = () => {
   align-items: center;
 }
 
+.words {
+  height: 50%;
+}
+
+.word-input {
+  height: 10vmin;
+}
+
 .word-container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
 }
 
 .char-cell {
   background-color: #ffffff;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 8px;
   font: "VAG World";
   font-weight: 700;
-  font-size: 5vmin;
-  width: 8vmin;
-  height: 8vmin;
-  margin: 6px;
+  font-size: 3vmin;
+  width: 5vmin;
+  height: 5vmin;
+  margin: 2px;
 }
 
 .char-cell-guessed {
@@ -158,5 +176,16 @@ const checkProgress = () => {
 
 .word-block {
   text-align: center;
+}
+@media only screen and (max-width: 600px) {
+  .char-cell {
+    font-size: 5vmin;
+    width: 8vmin;
+    height: 8vmin;
+  }
+
+  .word-input {
+    height: 20vmin;
+  }
 }
 </style>

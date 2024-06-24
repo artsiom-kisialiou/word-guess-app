@@ -66,4 +66,16 @@ const nextLevel = () => {
   box-shadow: none;
   transform: translateY(4px);
 }
+
+@media only screen and (max-width: 600px) {
+  .title {
+    margin-top: 40vmin;
+  }
+
+  .next-level {
+    width: 250px;
+    height: 70px;
+    font-size: 20px;
+  }
+}
 </style>

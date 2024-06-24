@@ -1,26 +1,24 @@
 <template>
-  <div style="display: flex; align-items: center">
-    <div
-      class="circle"
-      :style="`--total: ${props.characters.length}`"
+  <div
+    class="circle"
+    :style="`--total: ${props.characters.length}`"
+  >
+    <button
+      v-for="(char, idx) in chars"
+      class="char-button"
+      :class="char.hover"
+      :style="`--i: ${idx}`"
+      @mousedown.left="handleClick(char)"
+      @mouseenter.left="hover ? handleMove(char) : ''"
+      @mouseup.left="actionOver"
+      @touchstart="handleClick(char)"
+      @touchmove="handleTouch"
+      @touchend="actionOver"
     >
-      <button
-        v-for="(char, idx) in chars"
-        class="char-button"
-        :class="char.hover"
-        :style="`--i: ${idx}`"
-        @mousedown.left="handleClick(char)"
-        @mouseenter.left="hover ? handleMove(char) : ''"
-        @mouseup.left="mouseOver"
-        @touchstart="handleClick(char)"
-        @touchenter="hover ? handleMove(char) : ''"
-        @touchcancel="mouseOver"
-      >
-        <span>
-          {{ char.value }}
-        </span>
-      </button>
-    </div>
+      <span>
+        {{ char.value }}
+      </span>
+    </button>
   </div>
 </template>
 
@@ -29,6 +27,7 @@ import { ref, watch, onMounted } from "vue";
 
 const chars = ref([]);
 const hover = ref(false);
+
 const emit = defineEmits(["update:modelValue", "typeOver"]);
 const props = defineProps({
   characters: {
@@ -55,7 +54,19 @@ const fillChars = () => {
   });
 };
 
-const mouseOver = () => {
+const handleTouch = (e) => {
+  const xPos = e.changedTouches[0].pageX;
+  const yPos = e.changedTouches[0].pageY;
+  const element = document.elementFromPoint(xPos, yPos);
+
+  if (element.classList.contains("char-button")) {
+    const idx = element.style.getPropertyValue("--i");
+    chars.value[idx].hover = "char-pressed";
+    emit("update:modelValue", chars.value[idx].value);
+  }
+};
+
+const actionOver = () => {
   hover.value = false;
   chars.value.forEach((char) => {
     char.hover = "";
@@ -84,22 +95,19 @@ const handleClick = (char) => {
   place-items: center;
   background-color: transparent;
   border: 10px solid #3e4a68;
-  height: 294px;
   border-radius: 50%;
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
-  width: 294px;
 
-  --radius: 20vmin;
+  --radius: 15vmin;
   width: calc(2 * var(--radius));
   height: calc(2 * var(--radius));
 }
-
 .char-button {
   cursor: pointer;
   grid-area: layer;
-  width: 10vmin;
-  height: 10vmin;
+  width: 6vmin;
+  height: 6vmin;
   border-radius: 50%;
   border: 0;
   box-shadow: 0 2px #b0b0b0;
@@ -109,7 +117,7 @@ const handleClick = (char) => {
   place-items: center;
 
   background: #ffffff;
-  color: #000000;
+  color: #4d4d4d;
 
   --d: calc(var(--i) / var(--total));
 
@@ -127,7 +135,7 @@ const handleClick = (char) => {
 
 .char-button span {
   font-weight: 700;
-  font-size: 5vmin;
+  font-size: 3vmin;
   text-align: center;
 }
 
@@ -135,5 +143,22 @@ const handleClick = (char) => {
   background: #e96fa4;
   color: #ffffff;
   box-shadow: 0 2px #af638c;
+}
+
+@media only screen and (max-width: 600px) {
+  .circle {
+    --radius: 20vmin;
+    width: calc(2 * var(--radius));
+    height: calc(2 * var(--radius));
+  }
+
+  .char-button {
+    width: 10vmin;
+    height: 10vmin;
+  }
+
+  .char-button span {
+    font-size: 5vmin;
+  }
 }
 </style>
