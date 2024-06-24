@@ -1,4 +1,8 @@
 <template>
+  <ModalComponent
+    :show="modalComponent"
+    @refresh="refreshPage"
+  />
   <VictoryScreen
     v-if="victory"
     :level="levelNum"
@@ -20,7 +24,10 @@ import level1 from "./levels/1.json";
 import level2 from "./levels/2.json";
 import level3 from "./levels/3.json";
 import VictoryScreen from "./components/VictoryScreen.vue";
+import ModalComponent from "./components/ModalComponent.vue";
 
+const channel = new BroadcastChannel("tab-activity");
+const modalComponent = ref(false);
 const currentLevel = ref(0);
 const currentLevelData = ref({});
 const levelNum = ref(1);
@@ -38,6 +45,23 @@ onBeforeMount(() => {
     loadLevelByName(currentLevel.value);
   }
 });
+
+channel.addEventListener("message", (event) => {
+  if (event.data === "open-new-tab") {
+    modalComponent.value = true;
+  }
+});
+
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) {
+    channel.postMessage("open-new-tab");
+  }
+});
+
+const refreshPage = () => {
+  modalComponent.value = false;
+  window.location.reload();
+};
 
 const setProgressInStorage = () => {
   return localStorage.setItem(
