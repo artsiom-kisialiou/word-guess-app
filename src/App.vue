@@ -1,20 +1,22 @@
 <template>
-  <ModalComponent
-    :show="modalComponent"
-    @refresh="refreshPage"
-  />
-  <VictoryScreen
-    v-if="victory"
-    :level="levelNum"
-    @next-level="loadLevelByName(1)"
-  />
-  <MainScreen
-    v-if="!victory"
-    :levelNum="levelNum"
-    :currentLevel="currentLevel"
-    :currentLevelData="currentLevelData"
-    @on-victory="showVictoryScreen"
-  />
+  <section>
+    <ModalComponent
+      :show="modalComponent"
+      @refresh="refreshPage"
+    />
+    <VictoryScreen
+      v-if="victory"
+      :level="levelNum"
+      @next-level="loadLevelByName(1)"
+    />
+    <MainScreen
+      v-if="!victory"
+      :levelNum="levelNum"
+      :currentLevel="currentLevel"
+      :currentLevelData="currentLevelData"
+      @on-victory="showVictoryScreen"
+    />
+  </section>
 </template>
 
 <script setup>
