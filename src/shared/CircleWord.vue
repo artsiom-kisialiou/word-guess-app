@@ -7,21 +7,27 @@
       v-for="(char, idx) in chars"
       class="char-button"
       :class="char.hover"
-      :style="`--i: ${idx}; background-color: ${char.hover ? `pink` : `white`}`"
+      :style="`--i: ${idx}`"
       @mousedown.left="handleClick(char)"
       @mouseenter.left="hover ? handleMove(char) : ''"
-      @mouseup="mouseOver"
+      @mouseup.left="actionOver"
+      @touchstart="handleClick(char)"
+      @touchmove="handleTouch"
+      @touchend="actionOver"
     >
-      {{ char.value }}
+      <span>
+        {{ char.value }}
+      </span>
     </button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, watch, onMounted } from "vue";
 
 const chars = ref([]);
 const hover = ref(false);
+
 const emit = defineEmits(["update:modelValue", "typeOver"]);
 const props = defineProps({
   characters: {
@@ -31,19 +37,43 @@ const props = defineProps({
   },
 });
 
-chars.value = props.characters.map((char) => {
-  return {
-    value: char,
-    hover: "",
-  };
+onMounted(() => {
+  fillChars();
 });
 
-const mouseOver = () => {
+watch(props, () => {
+  fillChars();
+});
+
+const fillChars = () => {
+  chars.value = props.characters.map((char) => {
+    return {
+      value: char,
+      hover: "",
+    };
+  });
+};
+
+const handleTouch = (e) => {
+  const xPos = e.changedTouches[0].pageX;
+  const yPos = e.changedTouches[0].pageY;
+  const element = document.elementFromPoint(xPos, yPos);
+
+  if (element.classList.contains("char-button")) {
+    const idx = element.style.getPropertyValue("--i");
+    chars.value[idx].hover = "char-pressed";
+    emit("update:modelValue", chars.value[idx].value);
+  }
+};
+
+const actionOver = () => {
   hover.value = false;
   chars.value.forEach((char) => {
     char.hover = "";
   });
-  emit("typeOver");
+  setTimeout(() => {
+    emit("typeOver");
+  }, 500);
 };
 
 const handleMove = (char) => {
@@ -65,22 +95,19 @@ const handleClick = (char) => {
   place-items: center;
   background-color: transparent;
   border: 10px solid #3e4a68;
-  height: 294px;
   border-radius: 50%;
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
-  width: 294px;
 
-  --radius: 25vmin;
+  --radius: 15vmin;
   width: calc(2 * var(--radius));
   height: calc(2 * var(--radius));
 }
-
 .char-button {
   cursor: pointer;
   grid-area: layer;
-  width: 8vmin;
-  height: 8vmin;
+  width: 6vmin;
+  height: 6vmin;
   border-radius: 50%;
   border: 0;
   box-shadow: 0 2px #b0b0b0;
@@ -90,9 +117,7 @@ const handleClick = (char) => {
   place-items: center;
 
   background: #ffffff;
-  color: #000000;
-  font-weight: bold;
-  font-size: 3vmin;
+  color: #4d4d4d;
 
   --d: calc(var(--i) / var(--total));
 
@@ -108,9 +133,32 @@ const handleClick = (char) => {
   transform: var(--transform);
 }
 
+.char-button span {
+  font-weight: 700;
+  font-size: 3vmin;
+  text-align: center;
+}
+
 .char-pressed {
   background: #e96fa4;
   color: #ffffff;
   box-shadow: 0 2px #af638c;
+}
+
+@media only screen and (max-width: 600px) {
+  .circle {
+    --radius: 20vmin;
+    width: calc(2 * var(--radius));
+    height: calc(2 * var(--radius));
+  }
+
+  .char-button {
+    width: 10vmin;
+    height: 10vmin;
+  }
+
+  .char-button span {
+    font-size: 5vmin;
+  }
 }
 </style>
