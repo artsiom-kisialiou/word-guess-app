@@ -25,7 +25,6 @@ const props = defineProps({
 });
 
 const nextLevel = () => {
-  console.log("next");
   emit("nextLevel");
 };
 </script>
