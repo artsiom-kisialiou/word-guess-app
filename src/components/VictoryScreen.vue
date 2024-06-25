@@ -7,6 +7,7 @@
     <button
       class="next-level"
       @click="nextLevel"
+      @touchend="nextLevel"
     >
       <span> Уровень {{ level + 1 }} </span>
     </button>
@@ -24,6 +25,7 @@ const props = defineProps({
 });
 
 const nextLevel = () => {
+  console.log("next");
   emit("nextLevel");
 };
 </script>
