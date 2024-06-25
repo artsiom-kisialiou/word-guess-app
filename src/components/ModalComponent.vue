@@ -19,6 +19,7 @@
       <button
         class="refresh-btn"
         @click="refreshPage"
+        @touchend="refreshPage"
       >
         <span>Обновить</span>
       </button>
