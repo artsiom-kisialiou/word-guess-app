@@ -84,10 +84,17 @@ const findUniqueChars = () => {
 };
 
 const showWord = (word) => {
+  const maxWordLength =
+    wordChars.value[wordChars.value.length - 1].chars.length;
+
   if (inputWord.value[inputWord.value.length - 1] == word) {
     return;
   } else {
-    inputWord.value.push(word);
+    if (inputWord.value.length < maxWordLength) {
+      inputWord.value.push(word);
+    } else {
+      return;
+    }
   }
 };
 
